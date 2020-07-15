@@ -1,0 +1,18 @@
+.txsp {
+    position: fixed;
+    z-index: 101;
+    left: 16px;
+    bottom: 16px;
+    background-color: rgb(255, 145, 165);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: white;
+    font-size: 16px;
+    user-select: none;
+}
+.txsp:hover {
+    cursor: pointer;
+}
+.txsp:active {
+    background-color: rgb(250, 70, 100);
+}
