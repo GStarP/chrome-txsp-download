@@ -1,18 +1,25 @@
 {
-    "name": "TXSP Downloader",
-    "description" : "download txsp videos",
-    "version": "1.0",
-    "manifest_version": 2,
-    "homepage_url": "https://github.com/GStarP",
-    "browser_action": {
-      "default_popup": "popup.html"
-    },
-    "content_scripts": [
-        {
-            "matches": ["https://v.qq.com/*"],
-            "run_at": "document_end",
-            "js": ["txsp.js"],
-            "css": ["txsp.css"]
-        }
-    ]
-  }
+  "name": "TXSP Downloader",
+  "description": "download txsp videos",
+  "version": "1.0",
+  "manifest_version": 2,
+  "homepage_url": "https://github.com/GStarP",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": ["txsp.js"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://v.qq.com/x/cover/*"
+      ],
+      "run_at": "document_end",
+      "js": [
+        "inject.js"
+      ],
+      "css": [
+        "txsp.css"
+      ]
+    }
+  ]
+}
