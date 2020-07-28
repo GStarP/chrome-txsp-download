@@ -159,6 +159,7 @@ function parseVideoReqInfo(res) {
 
 // 解析获取到的视频基本信息
 function parseVideoInfo(data) {
+  console.log(data)
   var vinfo = JSON.parse(data.vinfo)
   var vi = vinfo.vl.vi[0]
   var ui = vi.ul.ui[0]
@@ -175,7 +176,7 @@ function parseVideoInfo(data) {
 function showDownloadBtn () {
   var txsp = document.createElement('div')
   txsp.classList.add('txsp')
-  txsp.innerHTML = `${videoInfo.width} x ${videoInfo.height}  ${videoInfo.size} M`
+  txsp.innerHTML = `${videoInfo.width}x${videoInfo.height} ${videoInfo.size}M`
   txsp.addEventListener('click', () => {
     downloadVideo()
   })
@@ -184,16 +185,31 @@ function showDownloadBtn () {
 
 // 根据 m3u8 文件下载视频
 function downloadVideo() {
+  var joinFileContent = ''
   fetch(videoInfo.m3u8url)
     .then(res => res.text())
     .then(data => {
-      downloadFile(`${videoInfo.name}.m3u8`, data)
+      var baseUrlSplit = videoInfo.m3u8url.split('/')
+      baseUrlSplit.pop()
+      var baseUrl = baseUrlSplit.join('/')
+      var tsList = data.split('\n')
+      tsList.forEach((tsLine) => {
+        if (tsLine.length > 1 && tsLine[0] !== '#') {
+          var name = tsLine.split('?')[0]
+          joinFileContent += `file ${name}\n`
+          // TODO 需要手动取消窗口拦截
+          window.open(baseUrl + '/' + tsLine)
+        }
+      })
+      downloadFile('join.txt', joinFileContent)
     })
 }
 
-function downloadFile(filename, json) {
+function downloadFile(filename, json, type) {
+  if (!type)
+    type = 'text/plain'
   let el = document.createElement('a')
-  el.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json))
+  el.setAttribute('href', `data:${type},` + encodeURIComponent(json))
   el.setAttribute('download', filename)
   el.style.display = 'none'
   document.body.appendChild(el)
