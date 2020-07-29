@@ -186,25 +186,41 @@ function showDownloadBtn () {
 // 根据 m3u8 文件下载视频
 function downloadVideo() {
   var joinFileContent = ''
-  fetch(videoInfo.m3u8url)
-    .then(res => res.text())
-    .then(data => {
-      var baseUrlSplit = videoInfo.m3u8url.split('/')
-      baseUrlSplit.pop()
-      var baseUrl = baseUrlSplit.join('/')
-      var tsList = data.split('\n')
-      tsList.forEach((tsLine) => {
-        if (tsLine.length > 1 && tsLine[0] !== '#') {
-          var name = tsLine.split('?')[0]
-          joinFileContent += `file ${name}\n`
-          // TODO 需要手动取消窗口拦截
-          window.open(baseUrl + '/' + tsLine)
-        }
-      })
-      downloadFile('join.txt', joinFileContent)
-    })
+  // fetch(videoInfo.m3u8url)
+  //   .then(res => res.text())
+  //   .then(data => {
+  //     var baseUrlSplit = videoInfo.m3u8url.split('/')
+  //     baseUrlSplit.pop()
+  //     var baseUrl = baseUrlSplit.join('/')
+  //     var tsList = data.split('\n')
+  //     tsList.forEach((tsLine) => {
+  //       if (tsLine.length > 1 && tsLine[0] !== '#') {
+  //         var name = tsLine.split('?')[0]
+  //         joinFileContent += `file ${name}\n`
+  //         download(baseUrl + '/' + tsLine)
+  //       }
+  //     })
+  //     downloadFile('join.txt', joinFileContent)
+  //   })
+  showToast('后台开始下载')
 }
 
+/**
+ * 显示提示
+ * @param {String} text 文字内容
+ */
+function showToast(text) {
+  var toast = document.createElement('div')
+  toast.className = 'toast'
+  toast.innerText = text
+  document.body.appendChild(toast)
+
+  setTimeout(() => {
+    document.body.removeChild(toast)
+  }, 2000)
+}
+
+// 将已有内容下载为文件
 function downloadFile(filename, json, type) {
   if (!type)
     type = 'text/plain'
@@ -215,4 +231,34 @@ function downloadFile(filename, json, type) {
   document.body.appendChild(el)
   el.click()
   document.body.removeChild(el)
+}
+
+// 根据 url 下载文件
+function download(url) {
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  function iframeLoad() {
+    const win = iframe.contentWindow
+    const doc = win.document
+    if (win.location.href === url) {
+      iframe.parentNode.removeChild(iframe)
+    }
+  }
+  if ('onload' in iframe) {
+    iframe.onload = iframeLoad
+  } else if (iframe.attachEvent) {
+    iframe.attachEvent('onload', iframeLoad)
+  } else {
+    iframe.onreadystatechange = function onreadystatechange() {
+      if (iframe.readyState === 'complete') {
+        iframeLoad
+      }
+    };
+  }
+  iframe.src = ''
+  document.body.appendChild(iframe)
+
+  setTimeout(function loadUrl() {
+    iframe.contentWindow.location.href = url
+  }, 50)
 }
